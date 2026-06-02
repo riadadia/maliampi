@@ -1,0 +1,31 @@
+complete_workflow:
+    runs-on: ubuntu-24.04 # Upgrade from 20.04 to get a more modern baseline
+    env:
+      NXF_ANSI_LOG: 0
+      # renovate: datasource=github-releases depName=nextflow-io/nextflow versioning=semver
+      NXF_VER: "25.04.8" 
+    steps:
+      - uses: actions/checkout@v4 # Renovate natively tracks and updates GitHub Action versions
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25' # Renovate inherently tracks setup-java inputs natively
+          distribution: 'temurin'
+
+      - name: Set up Nextflow
+        uses: nf-core/setup-nextflow@v2 # Cleaner and more reliable than the raw bash script
+        with:
+          version: ${{ env.NXF_VER }}
+
+      - name: Free disk space
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          docker rmi $(docker image ls -aq)
+          df -h
+          
+      - name:  Run maliampi (full workflow)
+        run: |
+          nextflow run main.nf -with-docker ubuntu:24.04 -c nextflow.config.sample -profile testing --manifest maliampi-practice-data/autotest_manifest.csv --repo_fasta  maliampi-practice-data/test.repo.fasta --repo_si maliampi-practice-data/test.repo.seq_info.csv --taxdmp maliampi-practice-data/taxdmp.zip --email j-dev@golob.org --raxmlng_parsimony_trees 1 --raxmlng_random_trees 1 --output output
