@@ -1,22 +1,41 @@
-profiles{
-    // By default, give each process a generous amount of resources
+docker {
+    enabled = true
+    runOptions = '--platform linux/amd64'
+}
+
+process {
+    withName: 'make_refpkg_wf:BuildTaxtasticDB' {
+        container = 'quay.io/biocontainers/taxtastic:0.12.0--pyhdfd78af_0'
+    }
+}
+
+profiles {
     standard {
         process {
+            executor = 'local'
             withLabel: 'io_limited' {
-                cpus = 2
+                cpus = 1
+                memory = 4.GB
+            }
+            withLabel: 'io_limited_local' {
+                cpus = 1
+                memory = 4.GB
+            }
+            withLabel: 'io_mem' {
+                cpus = 1
                 memory = 4.GB
             }
             withLabel: 'io_net' {
                 cpus = 2
                 memory = 4.GB
-            }            
+            }
             withLabel: 'multithread' {
-                cpus = 4
-                memory = 30.GB
+                cpus = 2
+                memory = 6.GB
             }
             withLabel: 'mem_medium' {
-                cpus = 4
-                memory = 30.GB
+                cpus = 2
+                memory = 6.GB
             }
             withLabel: 'mem_veryhigh' {
                 cpus = 16
@@ -24,8 +43,10 @@ profiles{
             }
         }
     }
+
     testing {
         process {
+            executor = 'local'
             withLabel: 'io_limited' {
                 cpus = 1
                 memory = 1.GB
