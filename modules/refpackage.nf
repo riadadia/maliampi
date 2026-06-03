@@ -493,7 +493,7 @@ process BuildTaxtasticDB {
         file "taxonomy.db"
 
     """
-    taxit new_database taxonomy.db -z ${taxdump_zip_f}
+    taxit new_database taxonomy.db -z taxdmp.zip --unknown-action no_rank
     """
 }
 
